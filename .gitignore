@@ -3,11 +3,9 @@ compile_flags.txt
 test
 CMakeLists.txt
 base
-src/include/async_logging.h
 src/include/condition.h
 src/include/file_util.h
 src/include/log_file.h
-src/include/log_stream.h
 src/include/mutex_lock.h
 
 
