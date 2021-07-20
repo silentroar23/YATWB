@@ -52,5 +52,6 @@ class Poller {
 
   EventLoop* owner_loop_;
   PollFdList poll_fds_;
+  /* Map fd to Channel* */
   ChannelMap channel_map_;
 };

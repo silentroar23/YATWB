@@ -5,6 +5,7 @@
 #include "macro.h"
 
 class EventLoop;
+class Timestamp;
 
 /**
  * A selectable I/O channel
@@ -16,6 +17,7 @@ class EventLoop;
 class Channel {
  public:
   using Callback = std::function<void()>;
+  using ReadEventCallback = std::function<void(Timestamp)>;
 
   Channel(EventLoop* loop, int fd);
 
@@ -33,7 +35,7 @@ class Channel {
 
   void setIndex(int index) { index_ = index; }
 
-  void handleEvents();
+  void handleEvents(Timestamp recv_time);
 
   bool isNoneEvent() { return events_ == NoneEvent; }
 
@@ -41,7 +43,7 @@ class Channel {
 
   void setOwnerLoop(EventLoop* owner_loop) { owner_loop_ = owner_loop; }
 
-  void setReadCallback(const Callback& cb) { read_cb_ = cb; }
+  void setReadCallback(const ReadEventCallback& cb) { read_cb_ = cb; }
 
   void setWriteCallback(const Callback& cb) { write_cb_ = cb; }
 
@@ -81,7 +83,7 @@ class Channel {
  private:
   void update();
 
-  Callback read_cb_;
+  ReadEventCallback read_cb_;
   Callback write_cb_;
   Callback error_cb_;
   Callback close_cb_;

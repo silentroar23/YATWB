@@ -41,6 +41,8 @@ class EventLoop {
 
   void updateChannel(Channel* channel);
 
+  void removeChannel(Channel* channel);
+
   /* Should be able to be called in non-I/O thread */
   TimerId runAt(const Timestamp& time, const Timer::TimerCallback& cb) {
     return timer_queue_->addTimer(cb, time, 0.0);
@@ -84,11 +86,11 @@ class EventLoop {
   // The thread creating this EventLoop
   const pid_t thread_id_;
   Timestamp poll_return_time_;
-  std::shared_ptr<Poller> poller_;
-  std::shared_ptr<TimerQueue> timer_queue_;
+  std::unique_ptr<Poller> poller_;
+  std::unique_ptr<TimerQueue> timer_queue_;
 
   int wakeup_fd_;
-  std::shared_ptr<Channel> wakeup_channel_;
+  std::unique_ptr<Channel> wakeup_channel_;
   ChannelList active_channels_;
 
   // Protect pending_functors_

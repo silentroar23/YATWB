@@ -2,6 +2,7 @@
 
 #include "event_loop.h"
 #include "logging.h"
+#include "timestamp.h"
 
 const int Channel::NoneEvent = 0;
 const int Channel::ReadEvent = POLLIN | POLLPRI;
@@ -20,7 +21,7 @@ Channel::~Channel() { assert(!events_handling_); }
 void Channel::update() { loop_->updateChannel(this); }
 
 // Use nonblocking I/O
-void Channel::handleEvents() {
+void Channel::handleEvents(Timestamp recv_time) {
   events_handling_ = true;
   if (revents_ & POLLNVAL) {
     LOG << "Channel::handle_events() POLLNVAL";
@@ -36,7 +37,7 @@ void Channel::handleEvents() {
   }
 
   if (revents_ & (POLLIN | POLLPRI | POLLRDHUP)) {
-    if (read_cb_) read_cb_();
+    if (read_cb_) read_cb_(recv_time);
   }
 
   if (revents_ & POLLOUT) {

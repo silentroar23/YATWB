@@ -61,17 +61,24 @@ void Poller::updateChannel(Channel* channel) {
     int idx = channel->getIndex();
     assert(idx >= 0 && idx < poll_fds_.size());
 
-    // Update
+    /* Update */
     struct pollfd& pfd = poll_fds_[idx];
-    assert(pfd.fd == channel->getFd() || pfd.fd == -1);
+    assert(pfd.fd == channel->getFd() || pfd.fd == -channel->getFd() - 1);
     pfd.events = channel->getEvents();
     pfd.revents = 0;
     if (channel->isNoneEvent()) {
-      // Ignore this pollfd
-      pfd.fd = -1;
+      /* Ignore this pollfd */
+      // TODO(Q): why set to this?
+      pfd.fd = -channel->getFd() - 1;
     }
   }
 }
+
+/**
+ * channel_map_ only holds a pointer on Channel which is owned by TcpConnection.
+ * So this function will be called in TcpConnection::destroyConnection to remove
+ * the Channel ptr from channel_map_
+ */
 void Poller::removeChannel(Channel* channel) {
   assertInLoopThread();
   LOG << "fd = " << channel->getFd();
@@ -87,14 +94,17 @@ void Poller::removeChannel(Channel* channel) {
   assert(n == 1);
   (void)n;
   if (static_cast<size_t>(idx) == poll_fds_.size() - 1) {
+    /* This Channel is already the last one, need not swap, simply pop */
     poll_fds_.pop_back();
   } else {
-    int channelAtEnd = poll_fds_.back().fd;
+    int channel_fd_at_end = poll_fds_.back().fd;
     iter_swap(poll_fds_.begin() + idx, poll_fds_.end() - 1);
-    if (channelAtEnd < 0) {
-      channelAtEnd = -channelAtEnd - 1;
+    /* When the Channel is set to ignore all events, its fd will be set to
+     * {-channel->getFd() - 1} */
+    if (channel_fd_at_end < 0) {
+      channel_fd_at_end = -channel_fd_at_end - 1;
     }
-    channel_map_[channelAtEnd]->setIndex(idx);
+    channel_map_[channel_fd_at_end]->setIndex(idx);
     poll_fds_.pop_back();
   }
 }

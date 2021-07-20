@@ -54,6 +54,12 @@ void EventLoop::updateChannel(Channel* channel) {
   poller_->updateChannel(channel);
 }
 
+void EventLoop::removeChannel(Channel* channel) {
+  assert(channel->getOwnerLoop() == this);
+  assertInLoopThread();
+  poller_->removeChannel(channel);
+}
+
 /* Wake up I/O threads by writing 8 bytes on wakeup_fd_ */
 void EventLoop::wakeup() {
   uint64_t one = 1;

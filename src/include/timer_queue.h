@@ -62,7 +62,7 @@ class TimerQueue {
 
   EventLoop* loop_;
   const int timerfd_;
-  Channel timerfd_channel_;
+  Channel channel_;
 
   /* Timer set sorted by expiration */
   TimerSet timers_;
