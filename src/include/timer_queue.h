@@ -21,7 +21,7 @@ class EventLoop;
 class TimerQueue {
  public:
   class TimerEntryCmp {
-    // Cannot use auto inside class, so make TimerEntryCmp a function object
+    /* Cannot use auto inside class, so make TimerEntryCmp a function object */
     bool operator()(const std::unique_ptr<Timer>& l,
                     const std::unique_ptr<Timer>& r) {
       return l->getExpiration() < r->getExpiration();
@@ -37,8 +37,10 @@ class TimerQueue {
 
   ~TimerQueue();
 
-  // Schedule the callback to be run at a given time, repeat if interval > 0.
-  // Must be thread safe. Usually called from non-I/O threads
+  /**
+   * Schedule the callback to be run at a given time, repeat if interval > 0
+   * Must be thread safe. Usually called from non-I/O threads
+   */
   TimerId addTimer(const Timer::TimerCallback& cb, Timestamp when,
                    double interval);
 
@@ -47,21 +49,21 @@ class TimerQueue {
  private:
   void addTimerInLoop(std::unique_ptr<Timer>& timer);
 
-  // Clear all expired timers
+  /* Clear all expired timers */
   std::vector<TimerEntry> getExpired(Timestamp now);
 
   void reset(std::vector<TimerEntry>& expired, Timestamp now);
 
-  // Pass by value
+  /* Pass by value */
   bool insert(std::unique_ptr<Timer> timer);
 
-  // Called when timerfd alarms
+  /* Called when timerfd alarms */
   void handleRead();
 
   EventLoop* loop_;
   const int timerfd_;
   Channel timerfd_channel_;
 
-  // Timer set sorted by expiration
+  /* Timer set sorted by expiration */
   TimerSet timers_;
 };

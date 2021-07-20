@@ -21,6 +21,8 @@ class Channel {
 
   DISALLOW_COPY(Channel);
 
+  ~Channel();
+
   int getFd() { return fd_; }
 
   int getEvents() { return events_; }
@@ -39,24 +41,50 @@ class Channel {
 
   void setOwnerLoop(EventLoop* owner_loop) { owner_loop_ = owner_loop; }
 
-  void setReadHandler(const Callback& cb) { readHandler_ = cb; }
+  void setReadCallback(const Callback& cb) { read_cb_ = cb; }
 
-  void setWriteHandler(const Callback& cb) { writeHandler_ = cb; }
+  void setWriteCallback(const Callback& cb) { write_cb_ = cb; }
 
-  void setErrorHandler(const Callback& cb) { errorHandler_ = cb; }
+  void setErrorCallback(const Callback& cb) { error_cb_ = cb; }
 
-  // Set ReadEvent and register this channel to Poller::poll_fds_
+  void setCloseCallback(const Callback& cb) { close_cb_ = cb; }
+
+  /* Set ReadEvent and register this channel to Poller::poll_fds_ */
   void enableReading() {
     events_ |= ReadEvent;
     update();
   }
 
+  /* Set WriteEvent and register this channel to Poller::poll_fds_ */
+  void enableWriting() {
+    events_ |= WriteEvent;
+    update();
+  }
+
+  void disableReading() {
+    events_ &= ~ReadEvent;
+    update();
+  }
+
+  void disableWriting() {
+    events_ &= ~WriteEvent;
+    update();
+  }
+
+  void disableAllEvents() {
+    events_ = NoneEvent;
+    update();
+  }
+
+  bool isWriting() { return events_ & WriteEvent; }
+
  private:
   void update();
 
-  Callback readHandler_;
-  Callback writeHandler_;
-  Callback errorHandler_;
+  Callback read_cb_;
+  Callback write_cb_;
+  Callback error_cb_;
+  Callback close_cb_;
 
   static const int NoneEvent;
   static const int ReadEvent;
@@ -70,4 +98,5 @@ class Channel {
   int index_;
 
   EventLoop* owner_loop_;
+  bool events_handling_;
 };

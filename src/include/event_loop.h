@@ -2,6 +2,7 @@
 
 #include <sys/_types/_pid_t.h>
 
+#include <atomic>
 #include <mutex>
 #include <vector>
 
@@ -18,7 +19,9 @@ class EventLoop {
   using Functor = std::function<void()>;
 
   EventLoop();
+
   DISALLOW_COPY(EventLoop);
+
   ~EventLoop();
 
   void loop();
@@ -70,7 +73,7 @@ class EventLoop {
  private:
   void abortNotInLoopThread();
 
-  // Handle wakeup event
+  /* Handle wakeup event */
   void handleRead();
 
   void doPendingFunctors();

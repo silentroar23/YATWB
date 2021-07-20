@@ -60,7 +60,7 @@ TimerQueue::TimerQueue(EventLoop* loop)
       timerfd_(createTimerfd()),
       timerfd_channel_(loop, timerfd_),
       timers_() {
-  timerfd_channel_.setReadHandler(std::bind(&TimerQueue::handleRead, this));
+  timerfd_channel_.setReadCallback(std::bind(&TimerQueue::handleRead, this));
   // we are always reading the timerfd, we disarm it with timerfd_settime.
   timerfd_channel_.enableReading();
 }
@@ -83,6 +83,21 @@ void TimerQueue::addTimerInLoop(std::unique_ptr<Timer>& timer) {
   if (earliest_to_alarm) {
     resetTimerfd(timerfd_, timer->getExpiration());
   }
+}
+
+void TimerQueue::handleRead() {
+  loop_->assertInLoopThread();
+  Timestamp now(Timestamp::now());
+  readTimerfd(timerfd_, now);
+
+  std::vector<TimerEntry> expired = getExpired(now);
+
+  /* Safe to callback outside critical section */
+  for (auto it = expired.begin(); it != expired.end(); ++it) {
+    it->second->run();
+  }
+
+  reset(expired, now);
 }
 
 std::vector<TimerQueue::TimerEntry> TimerQueue::getExpired(Timestamp now) {

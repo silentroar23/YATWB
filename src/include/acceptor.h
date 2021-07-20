@@ -8,7 +8,6 @@ class InetAddress;
 /**
  * Acceptor of incoming TCP connections.
  */
-
 class Acceptor {
  public:
   using NewConnectionCallback =
@@ -29,9 +28,9 @@ class Acceptor {
 
   EventLoop* loop_;
   /* Listening socket */
-  Socket accept_socket_;
+  Socket socket_;
   /* Channel dealing with listening socket */
-  Channel accept_channel_;
+  Channel channel_;
   NewConnectionCallback new_conn_cb_;
   bool listenning_;
 };

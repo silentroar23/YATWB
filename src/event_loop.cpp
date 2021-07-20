@@ -7,7 +7,7 @@
 #include "logging.h"
 #include "poller.h"
 
-// Used to check if current thread only has one EventLoop
+/* Used to check if current thread only has one EventLoop */
 thread_local EventLoop* event_loop_in_this_thread = nullptr;
 const int kPollTimeMs = 10000;
 
@@ -91,7 +91,7 @@ void EventLoop::queueInLoop(const Functor& cb) {
    * to wakeup() cos queueInLoop may be called in functors of pending_functors_.
    * Only when queueInLoop is called in handleEvents() wakeup() need not be
    * called, cos all push_back()-ed cbs will be called in doPendingFunctors() in
-   * the same loop
+   * the same iteration of the loop
    */
   if (!isInLoopThread() || calling_pending_functors_) {
     wakeup();

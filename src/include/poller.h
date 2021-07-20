@@ -27,13 +27,23 @@ class Poller {
 
   ~Poller() = default;
 
-  // Poll the I/O events
-  // Must be called in the loop thread
+  /**
+   * Poll the I/O events
+   * Must be called in the loop thread
+   */
   Timestamp poll(int timeoutMs, ChannelList* activeChannels);
 
-  // Change the interested I/O events
-  // Must be called in the loop thread
+  /**
+   * Change the interested I/O events
+   * Must be called in the loop thread
+   */
   void updateChannel(Channel* channel);
+
+  /**
+   * Remove the channel
+   * Must be called in the loop thread
+   */
+  void removeChannel(Channel* channel);
 
   void assertInLoopThread() { owner_loop_->assertInLoopThread(); }
 

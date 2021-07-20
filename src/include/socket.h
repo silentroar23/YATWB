@@ -15,7 +15,7 @@ class Socket {
 
   ~Socket();
 
-  int fd() const { return sockfd_; }
+  int getFd() const { return sockfd_; }
 
   /* abort if address in use */
   void bindAddress(const InetAddress& localaddr);

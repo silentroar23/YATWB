@@ -9,6 +9,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <atomic>
 #include <thread>
 #include <type_traits>
 
