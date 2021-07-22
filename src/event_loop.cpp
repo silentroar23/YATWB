@@ -11,6 +11,13 @@
 thread_local EventLoop* event_loop_in_this_thread = nullptr;
 const int kPollTimeMs = 10000;
 
+class SignalMask {
+ public:
+  SignalMask() { signal(SIGPIPE, SIG_IGN); }
+};
+
+SignalMask init_obj;
+
 EventLoop::EventLoop()
     : looping_(false), quit_(true), thread_id_(CurrentThread::tid()) {
   LOG << "EventLoop created" << this << " in thread" << thread_id_;
@@ -35,10 +42,10 @@ void EventLoop::loop() {
 
   while (!quit_) {
     active_channels_.clear();
-    poller_->poll(kPollTimeMs, &active_channels_);
+    poll_return_time_ = poller_->poll(kPollTimeMs, &active_channels_);
     for (auto it = active_channels_.begin(); it != active_channels_.end();
          ++it) {
-      (*it)->handleEvents();
+      (*it)->handleEvents(poll_return_time_);
     }
 
     doPendingFunctors();

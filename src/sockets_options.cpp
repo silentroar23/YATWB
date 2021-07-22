@@ -104,6 +104,12 @@ void sockets::close(int sockfd) {
   }
 }
 
+void sockets::shutdownWrite(int sockfd) {
+  if (shutdown(sockfd, SHUT_WR) < 0) {
+    LOG << "Error: sockets::shutdownWrite";
+  }
+}
+
 void sockets::toHostPort(char* buf, size_t size,
                          const struct sockaddr_in& addr) {
   char host[INET_ADDRSTRLEN] = "INVALID";
@@ -129,4 +135,15 @@ struct sockaddr_in sockets::getLocalAddr(int sockfd) {
     LOG << "sockets::getLocalAddr";
   }
   return local_addr;
+}
+
+int sockets::getSocketError(int sockfd) {
+  int optval;
+  socklen_t optlen = sizeof optval;
+
+  if (::getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &optval, &optlen) < 0) {
+    return errno;
+  } else {
+    return optval;
+  }
 }

@@ -29,8 +29,11 @@ class Thread {
 
   const std::string& name() const { return name_; }
 
+  static int numCreated() { return num_created_; }
+
  private:
   void setDefaultName();
+
   bool started_;
   bool joined_;
   pthread_t pthread_id_;

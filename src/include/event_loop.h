@@ -83,8 +83,11 @@ class EventLoop {
   std::atomic<bool> looping_;
   std::atomic<bool> quit_;
   std::atomic<bool> calling_pending_functors_;
-  // The thread creating this EventLoop
+
+  /* The thread creating this EventLoop */
   const pid_t thread_id_;
+
+  /* Used in Channel::handleEvents() */
   Timestamp poll_return_time_;
   std::unique_ptr<Poller> poller_;
   std::unique_ptr<TimerQueue> timer_queue_;

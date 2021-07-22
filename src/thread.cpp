@@ -111,7 +111,7 @@ void* startThread(void* obj) {
   return nullptr;
 }
 
-std::atomic<int> Thread::num_created_ = 0;
+std::atomic<int> Thread::num_created_{0};
 
 Thread::Thread(const ThreadFunc& func, const std::string& n)
     : started_(false),

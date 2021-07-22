@@ -1,5 +1,6 @@
 #include <memory>
 
+#include "buffer.h"
 #include "callbacks.h"
 #include "inet_addr.h"
 
@@ -34,9 +35,23 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
 
   bool connected() const { return state_ == States::Connected; }
 
+  void setTcpNoDelay(bool on);
+
+  void setTcpKeepAlive(bool on);
+
+  /* Thread safe */
+  void send(const std::string& message);
+
+  /* Thread safe */
+  void shutdown();
+
   /* Callback provided by user, passed in TcpServer::newConnection */
   void setConnectionCallback(const ConnectionCallback& cb) {
     connection_cb_ = cb;
+  }
+
+  void setWriteCallback(const WriteCompleteCallback& cb) {
+    write_cmpl_cb_ = cb;
   }
 
   /* Callback provided by user, passed in TcpServer::newConnection */
@@ -64,13 +79,18 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
 
   void setState(States s) { state_ = s; }
 
-  void handleRead();
+  void handleRead(Timestamp recv_time);
 
   void handleWrite();
 
   void handleClose();
 
   void handleError();
+
+  void sendInLoop(const std::string& message);
+
+  void shutdownInLoop();
+
   EventLoop* loop_;
   std::string name_;
   States state_;  // FIXME: use atomic variable
@@ -81,9 +101,25 @@ class TcpConnection : public std::enable_shared_from_this<TcpConnection> {
   std::unique_ptr<Channel> channel_;
   InetAddress local_addr_;
   InetAddress peer_addr_;
+
+  /**
+   * The following callbacks are computation tasks registered by user, and will
+   * be called in channel_->handle*() after it completes I/O
+   */
+
+  /* Invoked when this connection is established and destroyed  */
   ConnectionCallback connection_cb_;
+
+  /**
+   * Low water callback for output_buffer_
+   * Invoked when output_buffer_ is empty
+   */
+  WriteCompleteCallback write_cmpl_cb_;
+
   /* Invoked when readable events arrive */
   MessageCallback message_cb_;
+
+  /* Invoked when */
   CloseCallback close_cb_;
   Buffer input_buffer_;
   Buffer output_buffer_;

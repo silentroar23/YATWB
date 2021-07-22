@@ -31,8 +31,10 @@ class Channel {
 
   void setRevents(int revents) { revents_ = revents; }
 
+  /* For removing this Channel from Poller::poll_fds_ in O(1) */
   int getIndex() { return index_; }
 
+  /* For removing this Channel from Poller::poll_fds_ in O(1) */
   void setIndex(int index) { index_ = index; }
 
   void handleEvents(Timestamp recv_time);
@@ -96,7 +98,11 @@ class Channel {
   const int fd_;
   int events_;
   int revents_;
-  // This Channel's index in ChannelList
+
+  /**
+   * This Channel's index in ChannelList
+   * For removing this Channel from Poller::poll_fds_ in O(1)
+   */
   int index_;
 
   EventLoop* owner_loop_;
