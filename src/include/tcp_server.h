@@ -1,4 +1,5 @@
 #include <map>
+#include <memory>
 
 #include "callbacks.h"
 #include "macro.h"

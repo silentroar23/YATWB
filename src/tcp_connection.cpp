@@ -147,6 +147,7 @@ void TcpConnection::handleRead(Timestamp recv_time) {
   /* Invoke message callback when readable events arrive */
   if (n > 0) {
     message_cb_(shared_from_this(), &input_buffer_, recv_time);
+    /* POLLRDHUP */
   } else if (n == 0) {
     handleClose();
   } else {

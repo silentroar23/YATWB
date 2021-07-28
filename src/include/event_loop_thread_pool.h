@@ -1,3 +1,5 @@
+#pragma once
+
 #include <vector>
 
 #include "macro.h"
@@ -14,16 +16,16 @@ class EventLoopThreadPool {
 
   ~EventLoopThreadPool();
 
-  void setThreadNum(int numThreads) { numThreads_ = numThreads; }
+  void setThreadNum(int numThreads) { num_threads_ = numThreads; }
 
   void start();
 
   EventLoop* getNextLoop();
 
  private:
-  EventLoop* baseLoop_;
+  EventLoop* base_loop_;
   bool started_;
-  int numThreads_;
+  int num_threads_;
   int next_;  // always in loop thread
   std::vector<std::unique_ptr<EventLoopThread>> threads_;
   std::vector<EventLoop*> loops_;

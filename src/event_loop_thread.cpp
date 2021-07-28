@@ -20,19 +20,21 @@ EventLoop* EventLoopThread::startLoop() {
   thread_.start();
 
   std::unique_lock<std::mutex> lock(mutex_);
-  // Wait until an EvenLoop is created in ThreadFunc
+  /* Wait until an EvenLoop is created in IOThreadFunc */
   cv_.wait(lock, [&] { return loop_ != nullptr; });
 
   return loop_;
 }
 
 void EventLoopThread::IOThreadFunc() {
-  // This loop is invalid when IOThreadFunc exits
+  /* This loop is invalid when IOThreadFunc exits */
   EventLoop loop;
 
-  // Scope so the lock is freed before calling loop.loop()_
+  /**
+   * Scope so the lock is freed after cv_ notifies the thread waiting on mutex_
+   */
   {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<std::mutex> lock(mutex_);
     loop_ = &loop;
     cv_.notify_one();
   }

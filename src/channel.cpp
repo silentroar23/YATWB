@@ -1,7 +1,10 @@
 #include "channel.h"
 
+#include <sstream>
+
 #include "event_loop.h"
 #include "logging.h"
+#include "poll.h"
 #include "timestamp.h"
 
 const int Channel::NoneEvent = 0;
@@ -36,6 +39,10 @@ void Channel::handleEvents(Timestamp recv_time) {
     if (error_cb_) error_cb_();
   }
 
+  /**
+   * POLLRDHUP: stream socket peer closed connection or shutdown writing hald of
+   * connection
+   */
   if (revents_ & (POLLIN | POLLPRI | POLLRDHUP)) {
     if (read_cb_) read_cb_(recv_time);
   }

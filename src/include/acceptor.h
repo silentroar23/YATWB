@@ -1,3 +1,5 @@
+#include <functional>
+
 #include "channel.h"
 #include "macro.h"
 #include "socket.h"

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <sys/_types/_pid_t.h>
-
 #include <atomic>
 #include <mutex>
 #include <vector>

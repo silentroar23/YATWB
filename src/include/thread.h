@@ -1,5 +1,6 @@
 #pragma once
 
+#include <pthread.h>
 #include <sys/syscall.h>
 #include <unistd.h>
 
